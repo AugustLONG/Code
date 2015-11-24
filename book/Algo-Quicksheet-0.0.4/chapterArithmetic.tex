@@ -1,0 +1,150 @@
+\chapter{Arithmetic}
+
+
+\section{Big Number}
+\rih{Plus One.} Given a non-negative number represented as an array of digits, plus one to the number.
+\begin{python}
+def plusOne(self, digits):
+    for i in xrange(len(digits)-1, -1, -1):
+        digits[i] += 1
+        if digits[i] < 10:
+            return digits
+        else:
+            digits[i] -= 10
+
+    # if not return within the loop 
+    digits.insert(0, 1)
+    return digits
+\end{python}
+
+\section{Polish Notations}
+Polish Notation is in-fix while Reverse Polish Notation is post-fix. 
+
+Reverse Polish notation (RPN) is a mathematical notation in which every operator follows all of its operands (i.e. operands are followed by operators). RPN should be treated as the orthogonal expression.  
+
+Polish notation (PN) is a mathematical notation in which every operator is followed by its operands. 
+
+\subsection{Convert in-fix to post-fix (RPN)}
+\pyinline{ret} stores the final result of reverse polish notation. \pyinline{stk} stores
+the temporary result in strictly increasing order. 
+
+In-fix
+\begin{python}
+5 + ((1 + 2) * 4) - 3
+\end{python}
+
+can be written as
+\begin{python}
+5 1 2 + 4 * + 3 - 
+\end{python}
+Core clues:
+\begin{enumerate}
+\item \rih{Stack}. The stack temporarily stores the operators of \textit{strictly increasing precedence order}.
+\item \rih{Precedence}. Digits have the highest precedence, followed by \pyinline{*, /, +, (}. Notice that \pyinline{(} operator itself has the \textit{lowest} precedence.
+\item \rih{Bracket}. \textit{Match} the brackets. 
+\end{enumerate}
+Code:
+\begin{python}
+def infix2postfix(self, lst):
+  stk = []
+  ret = []  # post fix result
+  for elt in lst:
+    if elt.isdigit():
+      ret.append(elt)
+    elif elt == "(":
+      stk.append(elt)
+    elif elt == ")":
+      while stk and stk[-1] != "(":
+        ret.append(stk.pop())
+      stk.pop()  # pop "("
+    else:
+      while stk and precdn(elt) <= precdn(stk[-1]):
+        ret.append(stk.pop())
+      stk.append(elt)
+
+  while stk:  # clean up 
+    ret.append(stk.pop())
+
+  return ret
+\end{python}
+
+\subsection{Evaluate post-fix expressions}\label{section:evaluationPostFix}
+Consider: 
+
+In-fix
+\begin{python}
+5 + ((1 + 2) * 4) - 3
+\end{python}
+
+Post-fix
+\begin{python}
+5 1 2 + 4 * + 3 - 
+\end{python}
+Straightforward: use a \textit{stack} to store the number. Iterate the input, push
+stack when hit numbers, pop stack when hit operators.
+
+\subsection{Convert in-fix to pre-fix (PN)}
+PN is the \textit{reverse} of RPN, thus, scan the expression from right to left; and \pyinline{stk} stores the temporary result in non-decreasing order. 
+
+
+In-fix
+\begin{python}
+5 + ((1 + 2) * 4) - 3
+\end{python}
+
+can be written as
+\begin{python}
+3 4 2 1 + * 5 + -
+\end{python}
+
+reverse as 
+\begin{python}
+- + 5 * + 1 2 4 3
+\end{python}
+
+\begin{python}
+  def infix2prefix(self, lst):
+    """starting from right the left"""
+    stk = []
+    pre = []
+    for elt in reversed(lst):
+      if elt.isdigit():
+        pre.append(elt)
+      elif elt == ")":
+        stk.append(elt)
+      elif elt == "(":
+        while stk and stk[-1] != ")":
+          pre.append(stk.pop())
+        stk.pop()
+      else:
+        # < rather than <=
+        while stk and precdn(elt) < precdn(stk[-1]):  
+          pre.append(stk.pop())
+        stk.append(elt)
+
+    while stk:
+      pre.append(stk.pop())
+
+    pre.reverse()
+    return pre
+\end{python}
+
+
+\subsection{Evaluate pre-fix (PN) expressions}
+Consider: 
+
+In-fix
+\begin{python}
+5 + ((1 + 2) * 4) - 3
+\end{python}
+
+Pre-fix
+\begin{python}
+- + 5 * + 1 2 4 3
+\end{python}
+
+reverse as 
+\begin{python}
+3 4 2 1 + * 5 + -
+\end{python}
+Put into \textit{stack}, similar to evaluating post-fix \ref{section:evaluationPostFix}, but pay attention to operands order, which should be reversed when hitting a operator. 

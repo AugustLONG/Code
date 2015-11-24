@@ -1,0 +1,169 @@
+\chapter{Math}
+
+\section{Functions}
+\rih{Equals.} Requirements for equals
+\begin{enumerate}
+\item Reflexive
+\item Symmetric
+\item Transitive
+\item Non-null
+\end{enumerate}
+\rih{Compare.} Requirements for compares (total order):
+\begin{enumerate}
+\item Antisymmetry
+\item Transitivity
+\item Totality
+\end{enumerate}
+
+\section{Prime Numbers}
+\subsection{Sieve of Eratosthenes}
+\subsubsection{Basics}
+To find all the prime numbers less than or equal to a given integer n by Eratosthenes' method:
+\begin{enumerate}
+\item Create a list of consecutive integers from 2 through n: (2, 3, 4, ..., n).
+\item Initially, let $p$ equal 2, the first prime number.
+\item Starting from $p$, enumerate its multiples by counting to n in increments of $p$, and mark them in the list (these will be $2p$, $3p$, $4p$, ... ; the $p$ itself should not be marked).
+\item Find the first number greater than $p$ in the list that is not marked. If there was no such number, stop. Otherwise, let $p$ now equal this new number (which is the next prime), and repeat from step 3.
+\end{enumerate}
+
+When the algorithm terminates, the numbers remaining not marked in the list are all the primes below $n$.
+
+\subsubsection{Refinements}
+The main idea here is that every value for $p$ is prime, because we have already marked all the multiples of the numbers less than $p$. Note that some of the numbers being marked may have already been marked earlier (e.g., 15 will be marked both for 3 and 5).
+
+As a refinement, it is sufficient to mark the numbers in step 3 starting from $p^2$, because all the smaller multiples of $p$ will have already been marked at that point by the previous smaller prime factor other than $p$. From $p^2$, $p$ becomes the smaller prime factor of a composite number. This means that the algorithm is allowed to terminate in step 4 when $p^2$ is greater than n.
+
+Another refinement is to initially list odd numbers only, (3, 5, ..., n), and count in increments of $2p$ in step 3, thus marking only odd multiples of $p$. This actually appears in the original algorithm. This can be generalized with wheel factorization, forming the initial list only from numbers coprime with the first few primes and not just from odds (i.e., numbers coprime with 2), and counting in the correspondingly adjusted increments so that only such multiples of $p$ are generated that are coprime with those small primes, in the first place.
+
+To summarized, the refinements include:
+\begin{enumerate}
+\item Starting from $p^2$.
+\item Preprocessing even numbers and then only process odd numbers; thus the increment becomes $2p$.
+\end{enumerate}}
+
+\subsubsection{code}
+\begin{python}
+def countPrimes(n):
+    """
+    Find prime using Sieve's algorithm
+    :type n: int
+    :rtype: int
+    """
+    if n < 3:
+        return 0
+
+    is_prime = [True for _ in xrange(n)]
+    is_prime[0], is_prime[1] = False, False
+    for i in xrange(2, int(math.sqrt(n))+1):
+        if is_prime[i]:
+            for j in xrange(i*i, n, i):
+                is_prime[j] = False
+
+    return is_prime.count(True)
+\end{python}
+
+\subsection{Factorization}
+Backtracking: Section-\ref{factorization}.
+
+\section{Median}
+\subsection{Basic DualHeap}
+DualHeap to keep track the median when a method to find median is called multiple times. \begin{python}
+import heapq
+
+class DualHeap(object):
+  def __init__(self):
+    self.min_h = []
+    self.max_h = []  # need to negate the value 
+
+  def insert(self, num):
+    if not self.min_h or num > self.min_h[0]:
+      heapq.heappush(self.min_h, num)
+    else:
+      heapq.heappush(self.max_h, -num)
+    self.balance()
+
+  def balance(self):
+    l1 = len(self.min_h)
+    l2 = len(self.max_h)
+    if l1-l2 > 1:
+      heapq.heappush(self.max_h, 
+                     -heapq.heappop(self.min_h))
+      self.balance()
+    elif l2-l1 > 1:
+      heapq.heappush(self.min_h, 
+                     -heapq.heappop(self.max_h))
+      self.balance()
+    return
+
+  def get_median(self):
+    """Straightforward"""
+\end{python}
+
+\subsection{DualHeap with Lazy Deletion}\label{dh_lazy_del}
+Clues:
+\begin{enumerate}
+\item Wrap the value and wrap the heap
+\item When delete a value, mark it with tombstone. 
+\item When negate the value, only change the value, not the reference. 
+\item When heap pop, clean the op first. 
+\end{enumerate}
+\begin{python}
+import heapq
+from collections import defaultdict
+
+
+class Value(object):
+    def __init__(self, val):
+        self.val = val
+        self.deleted = False
+
+    def __neg__(self):
+        """negate without creating new instance"""
+        self.val = -self.val
+        return self
+
+    def __cmp__(self, other):
+        assert isinstance(other, Value)
+        return self.val - other.val
+
+    def __repr__(self):
+        return repr(self.val)
+
+
+class Heap(object):
+    def __init__(self):
+        self.h = []
+        self.len = 0
+
+    def push(self, item):
+        heapq.heappush(self.h, item)
+        self.len += 1
+
+    def pop(self):
+        self._clean_top()
+        self.len -= 1
+        return heapq.heappop(self.h)
+
+    def remove(self, item):
+        """lazy delete"""
+        item.deleted = True
+        self.len -= 1
+
+    def __len__(self):
+        return self.len
+
+    def _clean_top(self):
+        while self.h and self.h[0].deleted:
+            heapq.heappop(self.h)
+
+    def peek(self):
+        self._clean_top()
+        return self.h[0]
+
+
+class DualHeap(object):
+    def __init__(self):
+        self.min_h = Heap()  # represent right side
+        self.max_h = Heap()  # represent left side
+    # others similar as the previous section's above DualHeap
+\end{python}

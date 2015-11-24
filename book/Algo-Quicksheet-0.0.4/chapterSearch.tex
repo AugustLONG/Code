@@ -1,0 +1,199 @@
+\chapter{Search}
+
+\section{Binary Search}
+\runinhead{Variants:}
+\begin{enumerate}
+\item get the idx equal or just lower (floor)
+\item get the idx equal or just higher (ceil)
+\item \pyinline{bisect_left}
+\item \pyinline{bisect_right} 
+\end{enumerate}
+\subsection{idx equal or just lower}
+Binary search, get the idx of the element equal to or just lower than the target. The returned idx is the $A_{idx} \leq target$. It is possible to return $-1$. It is different from the \pyinline{bisect_lect}.
+
+\runinhead{Core clues:}
+\begin{enumerate}
+\item To get ``equal'', \pyinline{return mid}.
+\item To get ``just lower'', \pyinline{return lo-1}.
+\end{enumerate}
+$A_{idx} \leq target$.
+\begin{python}
+def bin_search(self, A, t, lo=0, hi=None):
+    if hi is None: hi = len(A)
+    
+    while lo < hi:
+        mid = (lo+hi)/2
+        if A[mid] == t:  return mid
+        elif A[mid] < t: lo = mid+1
+        else:            hi = mid
+
+    return lo-1
+\end{python}
+\subsection{idx equal or just higher}
+$A_{idx} \geq target$.
+\begin{python}
+def bin_search(self, A, t, lo=0, hi=None):
+    if hi is None: hi = len(A)
+   
+    while lo < hi:
+        mid = (lo+hi)/2
+        if A[mid] == t:  return mid
+        elif A[mid] < t: lo = mid+1
+        else:            hi = mid
+        
+    return lo
+\end{python}
+\subsection{bisect\_left}
+Return the index where to insert item x in list A. So if t already appears in the list,
+A.insert(t) will insert just before the \textit{leftmost} t already there.
+\runinhead{Core clues:}
+\begin{enumerate}
+\item Move \pyinline{lo} if $A_{mid} < t$
+\item Move \pyinline{hi} if $A_{mid} \geq t$
+\end{enumerate}
+
+\begin{python}
+def bisect_left(A, t, lo=0, hi=None):
+    if hi is None: hi = len(A)
+
+    while lo < hi:
+        mid = (lo+hi)/2
+        if A[mid] < t: lo = mid+1   
+        else:          hi = mid
+
+    return lo
+\end{python}
+
+\subsection{bisect\_right}
+Return the index where to insert item x in list A. So if t already appears in the list, A.insert(t) will insert just after the \textit{rightmost} x already there.
+\runinhead{Core clues:}
+\begin{enumerate}
+\item Move \pyinline{lo} if $A_{mid} \leq t$
+\item Move \pyinline{hi} if $A_{mid} > t$
+\end{enumerate}
+\begin{python}
+def bisect_right(A, t, lo=0, hi=None):
+    if hi is None: hi = len(A)
+
+    while lo < hi:
+        mid = (lo+hi)/2
+        if A[mid] <= t: lo = mid+1
+        else:           hi = mid 
+
+    return lo
+\end{python}
+\section{Applications}
+\subsection{Rotation}
+\runinhead{Find Minimum in Rotated Sorted Array.} Three cases to consider:
+\begin{enumerate}
+\item Monotonous 
+\item Trough 
+\item Peak
+\end{enumerate}
+
+If the elements can be duplicated, need to detect and skip. 
+\begin{python}
+def findMin(self, A):
+    lo = 0
+    hi = len(A)
+    mini = sys.maxint
+    while lo < hi:
+        mid = (lo+hi)/2
+        mini = min(mini, A[mid])
+        if A[lo] == A[mid]:  # JUMP
+            lo += 1
+        elif A[lo] < A[mid] <= A[hi-1]:
+            return min(mini, A[lo])
+        elif A[lo] > A[mid] <= A[hi-1]:  # trough
+            hi = mid
+        else:  # peak
+            lo = mid+1
+
+    return mini
+\end{python}
+\section{Combinations}
+\subsection{Extreme-value problems}\label{extremeValueProblem}
+\runinhead{Longest increasing subsequence.} Array $A$.
+
+Clues:
+\begin{enumerate}
+\item \pyinline{MIN}: \textit{min} of index \textit{last} value of LIS of a particular \textit{len}.
+\item \pyinline{RET}: result table, store the $\pi$'s idx (predecessor); (optional, to build the LIS, no need if only needs to return the length of LIS)
+\item \pyinline{bin_search}: For each currently scanning index \pyinline{i}, if it smaller (i.e. $\neg$ increasing), to maintain the \pyinline{MIN}, binary search to find the position to update the min value. The \pyinline{bin_search} need to find the element $\geq$ to \pyinline{A[i]}.
+\end{enumerate}
+\newpage
+\begin{python}
+def LIS(self, A):
+    n = len(A)
+    MIN = [-1 for _ in xrange(n+1)]
+    
+    l = 1
+    for i in xrange(1, n):
+        if A[i] > A[MIN[l]]:
+            l += 1
+            MIN[l] = i
+        else:
+            j = self.bin_search(MIN, A, A[i], 1, l+1)
+            MIN[j] = i
+
+    return l
+\end{python}
+If need to return the LIS itself. 
+\begin{python}
+    for i in xrange(1, n):
+        if A[i] > A[MIN[l]]:
+            l += 1
+            MIN[l] = i
+
+            RET[i] = MIN[l-1]  # (RET)
+        else:
+            j = self.bin_search(MIN, A, A[i], 1, l+1)
+            MIN[j] = i
+
+            RET[i] = MIN[j-1] if j-1 >= 1 else -1  # (RET)
+
+    # build the LIS (RET)
+    cur = MIN[l]
+    ret = []
+    while True:
+        ret.append(A[cur])
+        if RET[cur] == -1: break
+        cur = RET[cur]
+
+    ret = ret[::-1]
+    print ret
+\end{python}
+
+\section{High dimensional search}
+\subsection{2D}
+\runinhead{2D search matrix I.} $m\times n$ mat. Integers in each row are sorted from left to right. The first integer of each row is greater than the last integer of the previous row.
+$$
+\begin{bmatrix}
+1 & 3 & 5 & 7 \\
+10 & 11 & 16 & 20 \\
+23 & 30 & 34 & 50 \\
+\end{bmatrix}
+$$
+
+Row column search: starting at top right corner: $O(m+n)$.
+
+Binary search: search rows and then search columns: $O(\log m + \log n)$.
+
+
+\runinhead{2D search matrix II.} $m\times n$ mat. Integers in each row are sorted from
+left to right. Integers in each column are sorted in ascending from top to bottom.
+$$
+\begin{bmatrix}
+1&   4&  7& 11& 15 \\
+2&   5&  8& 12& 19 \\
+3&   6&  9& 16& 22 \\
+10& 13& 14& 17& 24 \\
+18& 21& 23& 26& 30 \\
+\end{bmatrix}
+$$ 
+
+Row column search: starting at top right corner: $O(m+n)$.
+
+Binary search: search rows and then search columns, but upper bound row and lower bound row: 
+
+$$O\big(\min(n\log m, m\log n)\big)$$

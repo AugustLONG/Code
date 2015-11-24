@@ -1,0 +1,133 @@
+%%%%%%%%%%%%%%%%%%%%%%%% editor.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% sample root file for the contributions of a "contributed volume"
+%
+% Use this file as a template for your own input.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Springer %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% RECOMMENDED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[graybox, envcountchap, twocolum]{styles/svmult}
+
+% general metadata:
+\author{Author: idf@github}
+\title{Algorithm Quicksheet}
+\subtitle{Classical equations, diagrams and tricks in algorithm}
+% choose options for [] as required from the list
+% in the Reference Guide
+
+\usepackage{amssymb,amsmath,bm}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+\usepackage{textcomp}
+\newcommand\abs[1]{\left\lvert#1\right\rvert}
+\usepackage{longtable}
+\usepackage{algorithm2e}
+\usepackage{tocbibind}
+\usepackage[toc]{multitoc}
+\usepackage{commons/commons}
+\usepackage{commons/code_style}
+\usepackage{style/customized}
+\usepackage{listings}
+\lstset{columns=fullflexible, commentstyle=\rm, basicstyle=\footnotesize} % remove columns=fullflexible for monospace
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{5\baselineskip}{\baselineskip}
+
+\renewcommand{\bibname}{References}
+\usepackage{mathptmx}        % selects Times Roman as basic font
+\usepackage{helvet}          % selects Helvetica as sans-serif font
+\usepackage{courier}         % selects Courier as typewriter font
+%\usepackage{type1cm}        % activate if the above 3 fonts are
+                             % not available on  your system
+
+\usepackage{makeidx}         % allows index generation
+\usepackage{graphicx}        % standard LaTeX graphics tool
+                             % when including figure files
+\usepackage[justification=centering]{caption}
+\usepackage{subfig}
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage[bottom]{footmisc}% places footnotes at page bottom
+\usepackage[bookmarksnumbered=true,
+            bookmarksopen=true,
+            colorlinks=true,
+            linkcolor=blue,
+            anchorcolor=blue,
+            citecolor=blue
+           ]{hyperref}
+
+\usepackage{comment}
+%\excludecomment{figure}
+\graphicspath{{figures/}}
+\newcommand\AND{\ \&\ }
+\newcommand\OR{\ |\ }
+\newcommand\XOR{\wedge}
+\newcommand\NOT{\ensuremath{\mathord{\sim}}}
+\newcommand\SHIFTL{\ll}
+\newcommand\SHIFTR{\gg}
+% see the list of further useful packages in the Reference Guide
+
+\makeindex             % used for the subject index
+                       % please use the style svind.ist with
+                       % your makeindex program
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[normalem]{ulem}
+
+\begin{document}
+
+\frontmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{titlepage}
+\include{dedic}
+%\include{foreword}
+\include{preface}
+%\include{acknow}
+
+\tableofcontents
+\include{cblist}
+%\include{acronym}
+\include{notation}
+
+
+\mainmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\include{part}
+% complexity
+\include{chapterTimeComplexity}
+\include{chapterMemoryComplexity}
+
+% data structure
+\include{chapterBasicDataStructures}
+\include{chapterLinkedList}
+\include{chapterHeap}
+\include{chapterTree}
+\include{chapterBalancedSearchTree}
+
+% algorithm
+\include{chapterSort}
+\include{chapterSearch}
+\include{chapterArray}
+\include{chapterString}
+\include{chapterStream}
+\include{chapterMath}
+\include{chapterArithmetic}
+\include{chapterCombinatorics}
+\include{chapterProbability}
+\include{chapterBitManipulation}
+\include{chapterGreedy}
+\include{chapterBacktracking}
+\include{chapterGraph}
+\include{chapterDynamicProgramming}
+\include{chapterInterval}
+\include{chapterGeneral}
+
+\backmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\include{glossary}
+\include{acronym}
+\printindex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

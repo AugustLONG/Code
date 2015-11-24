@@ -1,0 +1,89 @@
+\chapter{Memory Complexity}
+
+\section{Introduction}
+When discussing memory complexity, need to consider both 
+\begin{enumerate}
+\item \textbf{Heap}: the declared variables' size.
+\item \textbf{Stack}: the recursive functions' call stack.
+\end{enumerate}}
+\subsection{Memory for Data Type}
+The memory usage is based on Java.\\
+
+\begin{tabular}{ll}
+\hline\noalign{\smallskip}
+\textbf{Type} & \textbf{Bytes} \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+
+boolean & 1 \\
+byte & 1 \\
+char & 2 \\
+int & 4 \\
+float & 4 \\
+long & 8 \\
+double & 8\\
+
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\caption {for primitive types}
+\end{tabular}
+
+\begin{tabular}{ll}
+\hline\noalign{\smallskip}
+\textbf{Type} & \textbf{Bytes} \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+
+char[] & 2N+24 \\
+int[] & 4N+24 \\
+double[] & 8N+24 \\
+T[] & 8N+24 \\
+
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\caption{for one-dimensional arrays}
+\end{tabular}
+
+\begin{tabular}{ll}
+\hline\noalign{\smallskip}
+\textbf{Type} & \textbf{Bytes} \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+
+char[][] & 2MN \\
+int[][] & 4MN \\
+double[][] & 8MN \\
+
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\caption{for two-dimensional arrays}
+\end{tabular}
+
+\begin{tabular}{ll}
+\hline\noalign{\smallskip}
+\textbf{Type} & \textbf{Bytes} \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+
+Object overhead & 16 \\
+Reference & 8 \\
+Padding & 8x \\
+
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\caption{for objects}
+\end{tabular}
+\\
+Notice:
+\begin{enumerate}
+\item The reference takes memory of 8 bytes. 
+\item Reference includes object reference and innner class reference.
+\item T[] only considers reference; if consider underlying data structure, the memory is 8N+24+xN, where $x$ is the underlying data structure memory for each element.
+\item Padding is to make the object memory size of 8's multiple.
+\end{enumerate}
+
+\subsection{Example}
+The generics is passed as Boolean:
+\begin{java}
+public class Box<T> {   // 16 (object overhead)
+    private in N;       // 4 (int)
+    private T[] items;  // 8 (reference to array)
+                        // 8N+24 (array of Boolean references)
+                        // 24N (underlying Boolean objects)
+                        // 4 (padding to round up to a multiple)
+}
+\end{java} 
+
+Notice the multiple levels of references. 
